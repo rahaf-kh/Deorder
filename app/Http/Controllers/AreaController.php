@@ -7,12 +7,46 @@ use Illuminate\Http\Request;
 
 class AreaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getAreas($city_id)
     {
-        //
+        $areas = Area::where('city_id', $city_id)->get();
+    }
+    //  public function index(Request $request)
+    // {
+    //     if ($request->filled('search')) {
+    //         $search = $request->input('search');
+
+    //         $hotels = Hotel::where(function ($query) use ($search) {
+    //             $query->where('name', 'like', "%$search%");
+    //         })
+    //             ->orWhereHas('city', function ($cityQuery) use ($search) {
+    //                 $cityQuery->where('name', 'like', "%$search%");
+    //             })
+    //             ->paginate(2);
+    //     } else {
+
+    //         $hotels = Hotel::orderBy('id', 'desc')
+    //             ->with('hotel_images')
+    //             ->withAvg('rates', 'star')
+    //             ->paginate(4);
+    //         // dd($hotels->toArray());
+    //     }
+    //     return view('admins.hotels.index', ['hotels' => $hotels]);
+    public function index(Request $request)
+    {
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $areas = Area::where(function ($query) use ($search) {
+                $query->where('name', 'like', "%$search%");
+            })->orwhereHas('city', function ($CityQuery) use ($search) {
+                $CityQuery->where('name', 'like', "%$search%");
+            })->get();
+        }
+        else{
+            $areas=Area::orderBy('name','asc')->with('city');
+        }
+        return response()->json($areas);
     }
 
     /**
