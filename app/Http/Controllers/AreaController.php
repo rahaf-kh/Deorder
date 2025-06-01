@@ -8,6 +8,7 @@ use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class AreaController extends Controller
 {
@@ -36,22 +37,20 @@ class AreaController extends Controller
             $CityQuery->where('name', 'like', "%$search%");
         })->get();
 
-        return Area::where('name', $search)->first();
+        return $area;
     }
     public function create()
     {
         try {
-            // $user = auth('sanctum')->user();
-            // if (!$user->hasPermissionTo('manage areas')) {
-            //     return $this->unAuthorizeResponse();
-            // } else {
-                $cities = City::all();
-                $areas = Area::all();
-                return $this->successResponse([
-                    'cities' => $cities,
-                    'areas' => $areas
-                ], 'Data fetched successfully');
-            // }
+            $this->authorize('create', Area::class);
+            $cities = City::all();
+            $areas = Area::all();
+            return $this->successResponse([
+                'cities' => $cities,
+                'areas' => $areas
+            ], 'Data fetched successfully');
+        } catch (AuthorizationException $e) {
+            return $this->unAuthorizeResponse();
         } catch (\Throwable $th) {
             return $this->errorResponse("An error occurred while fetching data :", $th->getMessage());
         }
@@ -59,26 +58,22 @@ class AreaController extends Controller
     public function store(Request $request)
     {
         try {
-            // $user = auth('sanctum')->user();
-            // // if (!auth()->user()->hasPermissionTo('manage areas')) {
-            //     return $this->unAuthorizeResponse();
-            // } else {
-                if ($request->isMethod('POST')) {
-                    $validate = Validator::make($request->all(), [
-                        'city_id' => 'required|exists:cities,id|integer',
-                        'name' => 'required|string'
-                    ]);
-                }
-                if ($validate->fails()) {
-                    return $this->requiredField($validate->errors()->first());
-                } else {
-                    $area = Area::create([
-                        'city_id' => $request->city_id,
-                        'name' => $request->name,
-                    ]);
-                    return $this->successResponce($area, 'Area created successfully');
-                // }
+            $this->authorize('create', Area::class);
+            $validate = Validator::make($request->all(), [
+                'city_id' => 'required|exists:cities,id|integer',
+                'name' => 'required|string'
+            ]);
+            if ($validate->fails()) {
+                return $this->requiredField($validate->errors()->first());
+            } else {
+                $area = Area::create([
+                    'city_id' => $request->city_id,
+                    'name' => $request->name,
+                ]);
+                return $this->successResponce($area, 'Area created successfully');
             }
+        } catch (AuthorizationException $e) {
+            return $this->unAuthorizeResponse();
         } catch (\Throwable $th) {
             return $this->errorResponse("An error occurred while Storing data :", $th->getMessage());
         }
@@ -86,7 +81,7 @@ class AreaController extends Controller
     public function show(Request $request)
     {
         try {
-            if (($request->filled('search'))) {
+            if ($request->filled('search')) {
                 $search = $request->input('search');
                 $areas = $this->findArea($search);
                 if ($areas->isEmpty()) {
@@ -100,15 +95,18 @@ class AreaController extends Controller
             return $this->errorResponse('An unexpected error occurred', $th->getMessage());
         }
     }
-    public function edit(Request $request, $name)
+    public function edit($name)
     {
         try {
             $area = $this->findArea($name);
+            $this->authorize('update', $area);
             if ($area instanceof JsonResponse) {
                 return $area;
             } else {
                 return $this->successResponse($area, 'Area founded successfully');
             }
+        } catch (AuthorizationException $e) {
+            return $this->unAuthorizeResponse();
         } catch (\Throwable $th) {
             return $this->errorResponse('An unxpected error occurred', $th->getMessage());
         }
@@ -116,6 +114,7 @@ class AreaController extends Controller
     public function update(Request $request, Area $area, $name)
     {
         try {
+
             $area = $this->findArea($name);
             if (!$area) {
                 return $this->notFoundResponse('Area not found');
@@ -123,19 +122,22 @@ class AreaController extends Controller
             if ($area instanceof JsonResponse) {
                 return $area;
             } else {
+                $this->authorize('update', $area);
                 $validate = Validator::make(request()->all(), [
                     'city_id' => 'required|exists:cities,id|integer',
                     'name' => 'required|string'
                 ]);
                 if ($validate->fails()) {
                     return $this->requiredField($validate->errors()->first());
-                    $area = Area::update([
-                        'city_id' => $request->city_id,
-                        'name' => $request->name,
-                    ]);
+                } else {
+                    $area->city_id = $request->city_id;
+                    $area->name = $request->name;
+                    $area->save();
                     return $this->successResponce($area, 'Area updated successfully');
                 }
             }
+        } catch (AuthorizationException $e) {
+            return $this->unAuthorizeResponse();
         } catch (\Throwable $th) {
             return $this->errorResponse('An unxpected error occurred', $th->getMessage());
         }
@@ -143,14 +145,18 @@ class AreaController extends Controller
     public function destroy($name)
     {
         try {
-            $area =$this->findArea($name);
+
+            $area = $this->findArea($name);
 
             if ($area instanceof JsonResponse) {
                 return $area;
             } else {
+                $this->authorize('delete', $area);
                 $area->delete();
                 return $this->successResponse('Area deleted successfully');
             }
+        } catch (AuthorizationException $e) {
+            return $this->unAuthorizeResponse();
         } catch (\Throwable $th) {
             return $this->errorResponse('An unxpected error occurred', $th->getMessage());
         }
