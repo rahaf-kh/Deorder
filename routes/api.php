@@ -1,36 +1,31 @@
 <?php
 
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\CityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-
-//     Route::controller(CityController::class)->group(function () {
-//     Route::get('/cities', 'index')->name('cities.index');
-//     Route::get('/cities/create', 'create')->name('cities.create');
-//     Route::post('/cities', 'store')->name('cities.store');
-//     Route::get('/cities/{uuid}', 'show')->name('cities.show');
-//     Route::get('/cities/{uuid}/edit', 'edit')->name('cities.edit');
-//     Route::put('/cities/{uuid}', 'update')->name('cities.update');
-//     Route::delete('/cities/{uuid}', 'destroy')->name('cities.destroy');
-//     Route::get('/cities/search', 'Search')->name('cities.search');
-//     Route::get('/areas/{city}', 'getAreas')->name('city.areas');
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//   return $request->user();
 // });
 
-
-//********** Area Routes **********//
-Route::middleware('auth:sanctum')->get();
-
+//********** Area Routes **********//    
+Route::controller(AreaController::class)->group(function () {
+    Route::get('/areas', 'index')->name('areas.all');
+    Route::get('/area/{name}','show')->name('areas.show')->middleware('auth');
+    Route::get('/area/create','create')->name('area.create')->middleware('auth');
+    Route::post('/area/create','store')->name('area.store')->middleware('auth');
+    Route::get('/area/edit/{name}','edit')->name('area.edit')->middleware('auth');
+    Route::post('/area/edit/{name}','update')->name('area.update')->middleware('auth');
+    Route::get('/area/delete/{name}','destroy')->name('area.delete')->middleware('auth');
+});
+//********** City Routes **********//    
+Route::controller(CityController::class)->group(function () {
+    Route::get('/cities', 'index')->name('cities.all');
+    Route::get('/city/{name}','show')->name('citys.show')->middleware('auth');
+    Route::get('/city/create','create')->name('city.create')->middleware('auth');
+    Route::post('/city/create','store')->name('city.store')->middleware('auth');
+    Route::get('/city/edit/{name}','edit')->name('city.edit')->middleware('auth');
+    Route::post('/city/edit/{name}','update')->name('city.update')->middleware('auth');
+    Route::get('/city/delete/{name}','destroy')->name('city.delete')->middleware('auth');
 });

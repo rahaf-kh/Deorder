@@ -4,7 +4,7 @@ namespace App;
 
 class Permissions
 {
-    const Manage_Users = 'manage users';
+    // const Manage_Users = 'manage users';
     const Manage_Sopervisors = 'manage supervisors';
     const Manage_Deliveries = 'manage deliveries';
     const Manage_Customers = 'manage customers';
@@ -22,7 +22,7 @@ class Permissions
     public static function all(): array
     {
         return [
-            self::Manage_Users,
+            // self::Manage_Users,
             self::Manage_Sopervisors,
             self::Manage_Deliveries,
             self::Manage_Customers,
