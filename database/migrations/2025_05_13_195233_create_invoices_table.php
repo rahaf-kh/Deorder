@@ -13,8 +13,8 @@ return new class extends Migration
             $table->text('content');
             $table->double('price');
             $table->double('total');
-            $table->unsignedBigInteger('delivery_id');
-            $table->foreign('delivery_id')->on('deliveries')->references('id');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->on('users')->references('id');
             $table->unsignedBigInteger('order_id');
             $table->timestamps();
         });

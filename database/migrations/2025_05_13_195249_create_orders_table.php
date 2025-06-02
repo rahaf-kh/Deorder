@@ -13,8 +13,8 @@ return new class extends Migration
             // $table->uuid('uuid');
             $table->text('order');
             $table->enum('status',['completed','inProgress','waiting']);
-            $table->unsignedBigInteger('delivery_id');
-            $table->foreign('delivery_id')->on('deliveries')->references('id');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->on('users')->references('id');
             $table->timestamp('scheduled_time');//order time 
             $table->timestamp('estimated_time');//stimated order arrival time
             $table->timestamp('start_delivery_time');

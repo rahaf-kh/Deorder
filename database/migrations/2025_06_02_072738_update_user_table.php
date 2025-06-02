@@ -9,14 +9,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreign('area_id')->on('areas')->references('id');
+            $table->double('subscription_fees')->dafault(75000);
+            $table->text('bio')->nullable();
+            $table->boolean('active')->default(false);
+            $table->date('expire')->nullable();
         });
     }
+
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['area_id']);
-            $table->dropColumn(['area_id']);
+            $table->dropColumn('subscription_fees');
+            $table->dropColumn('bio');
+            $table->dropColumn('active');
+            $table->dropColumn('expire');
         });
     }
 };

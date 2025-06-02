@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('mobile')->unique();
             $table->uuid('uuid')->unique();
             $table->string('profile_image')->nullable();
-            $table->double('subscription_fees');
+            $table->double('subscription_fees')->default(75000);
             $table->text('address');
-            $table->text('bio');
-            $table->boolean('active');
-            $table->date('expire');
+            $table->text('bio')->nullable();
+            $table->boolean('active')->default(false);
+            $table->date('expire')->nullable();
             $table->unsignedBigInteger('area_id');
             $table->boolean('blocked')->default(false);
             $table->timestamp('email_verified_at')->nullable();

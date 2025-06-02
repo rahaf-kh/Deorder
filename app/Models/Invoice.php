@@ -13,7 +13,7 @@ class Invoice extends Model
         'price',
         'total',
         'delivery_fee',
-        'delivery_id',
+        'user_id',
         'order_id'
     ];
     protected $casts = [
@@ -21,7 +21,7 @@ class Invoice extends Model
         'price' => 'double',
         'total' => 'double',
         'delivery_fee' => 'double',
-        'delivery_id' => 'integer',
+        'user_id' => 'integer',
         'order_id' => 'integer'
     ];
     public function Order(): object
